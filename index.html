@@ -77,7 +77,17 @@
     background: white; border: 1.5px solid var(--border);
     border-radius: 10px; padding: 14px 18px; margin-bottom: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
   }
+  .fav-item-content { flex: 1; }
+  .fav-delete-btn {
+    background: none; border: 1.5px solid var(--border); border-radius: 8px;
+    width: 32px; height: 32px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 1rem; color: var(--muted);
+    transition: all 0.2s;
+  }
+  .fav-delete-btn:hover { background: #fde8e8; border-color: #d9534f; color: #d9534f; transform: scale(1.05); }
   .fav-item .fav-day { font-size: 0.7rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-family: "Inter", sans-serif; }
   .fav-item .fav-verse { font-size: 1rem; font-style: italic; color: var(--text); margin-top: 4px; }
 
@@ -287,12 +297,23 @@ function renderFavorites() {
   const favs = state.favorites || [];
   if (favs.length === 0) { favSection.style.display = "none"; return; }
   favSection.style.display = "block";
-  favList.innerHTML = favs.map(f => `
+  favList.innerHTML = favs.map((f, i) => `
     <div class="fav-item">
-      <div class="fav-day">${f.label}</div>
-      <div class="fav-verse">⭐ ${f.verse}</div>
+      <div class="fav-item-content">
+        <div class="fav-day">${f.label}</div>
+        <div class="fav-verse">⭐ ${f.verse}</div>
+      </div>
+      <button class="fav-delete-btn" onclick="deleteFavorite(${i})" title="Eliminar">🗑️</button>
     </div>
   `).join("");
+}
+
+function deleteFavorite(index) {
+  if (!state.favorites) return;
+  state.favorites.splice(index, 1);
+  saveState(state);
+  renderFavorites();
+  showToast("🗑️ Versículo eliminado");
 }
 
 function openDay(n) {
